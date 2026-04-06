@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Short Routine</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f7f7f7;
+    --surface2: #f0f0f0;
+    --border: #e2e2e2;
+    --border2: #d0d0d0;
+    --text: #0f0f0f;
+    --muted: #555;
+    --hint: #999;
+    --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+    --blue: #2563eb; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+    --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+    --pink: #db2777; --pink-bg: #fdf2f8; --pink-border: #fbcfe8;
+    --coral: #ea580c; --coral-bg: #fff7ed; --coral-border: #fed7aa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; line-height: 1.6; }
+
+  .tab-bar { display: flex; border-bottom: 1.5px solid var(--border); padding: 0 16px; position: sticky; top: 0; background: var(--bg); z-index: 10; overflow-x: auto; }
+  .tab { padding: 12px 13px 10px; font-size: 12px; font-weight: 600; color: var(--hint); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1.5px; transition: color 0.15s; user-select: none; white-space: nowrap; }
+  .tab:hover { color: var(--muted); }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  .page { display: none; padding: 20px 18px 48px; }
+  .page.active { display: block; }
+
+  header { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  header p { font-size: 12px; color: var(--hint); margin-top: 3px; font-family: 'DM Mono', monospace; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* EXPLAINER */
+  .explainer-block { margin-bottom: 10px; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; animation: fadeUp 0.35s ease both; }
+  .explainer-block:nth-child(1){animation-delay:0.04s}.explainer-block:nth-child(2){animation-delay:0.08s}
+  .explainer-block:nth-child(3){animation-delay:0.12s}.explainer-block:nth-child(4){animation-delay:0.16s}
+  .explainer-block:nth-child(5){animation-delay:0.20s}.explainer-block:nth-child(6){animation-delay:0.24s}
+  .explainer-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .explainer-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .explainer-htitle { font-size: 13px; font-weight: 600; color: var(--text); }
+  .explainer-hsub { font-size: 11px; color: var(--hint); font-family: 'DM Mono', monospace; margin-top: 1px; }
+  .explainer-body { padding: 0 14px 13px; font-size: 12px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 11px; }
+  .explainer-body strong { color: var(--text); font-weight: 600; }
+
+  .flow-diagram { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+  .flow-row { display: flex; align-items: center; gap: 10px; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 9px; margin-bottom: 4px; background: var(--bg); }
+  .flow-step-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .flow-step-text { font-size: 12px; color: var(--text); font-weight: 500; flex: 1; }
+  .flow-step-sub { font-size: 10px; color: var(--hint); font-family: 'DM Mono', monospace; }
+  .flow-arrow { text-align: center; color: var(--border2); font-size: 12px; margin: 1px 0; }
+
+  .info-box { border-radius: 9px; padding: 11px 13px; margin-top: 14px; font-size: 12px; line-height: 1.65; }
+
+  /* ROUTINE */
+  .step { display: flex; gap: 12px; margin-bottom: 8px; animation: fadeUp 0.35s ease both; }
+  .step:nth-child(1){animation-delay:0.04s}.step:nth-child(2){animation-delay:0.08s}
+  .step:nth-child(3){animation-delay:0.12s}.step:nth-child(4){animation-delay:0.16s}
+  .step:nth-child(5){animation-delay:0.20s}
+  .num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 3px; border: 1.5px solid; }
+  .card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; flex: 1; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 7px; border-radius: 5px; font-weight: 500; border: 1px solid; }
+  .card-desc { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.6; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .tag { font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 7px; border-radius: 5px; border: 1px solid var(--border2); color: var(--hint); background: var(--surface); }
+  .tag.amber { border-color: var(--amber-border); color: var(--amber); background: var(--amber-bg); }
+  .tag.blue { border-color: var(--blue-border); color: var(--blue); background: var(--blue-bg); }
+  .tag.green { border-color: var(--green-border); color: var(--green); background: var(--green-bg); }
+  .tag.purple { border-color: var(--purple-border); color: var(--purple); background: var(--purple-bg); }
+  .arrow { text-align: center; color: var(--border2); font-size: 13px; margin: 3px 0 3px 38px; }
+  .sub-note { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--hint); margin-top: 5px; }
+  .tip { background: var(--amber-bg); border: 1px solid var(--amber-border); border-left: 3px solid var(--amber); border-radius: 9px; padding: 11px 13px; margin-top: 16px; font-size: 12px; color: var(--muted); line-height: 1.65; }
+  .tip strong { color: var(--amber); font-weight: 600; }
+  .links { margin-top: 20px; }
+  .links h3 { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--hint); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .link-item { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: border-color 0.15s; }
+  .link-item:hover { border-color: var(--border2); background: var(--surface2); }
+  .link-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .link-name { font-size: 12px; color: var(--text); font-weight: 600; }
+  .link-sub { font-size: 10px; color: var(--hint); font-family: 'DM Mono', monospace; }
+
+  /* PROMPTS */
+  .order-note { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); border-left: 3px solid var(--green); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; line-height: 1.6; }
+  .prompt-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px; margin-bottom: 8px; animation: fadeUp 0.35s ease both; }
+  .prompt-card:nth-child(2){animation-delay:0.04s}.prompt-card:nth-child(3){animation-delay:0.08s}
+  .prompt-card:nth-child(4){animation-delay:0.12s}.prompt-card:nth-child(5){animation-delay:0.16s}
+  .prompt-card:nth-child(6){animation-delay:0.20s}.prompt-card:nth-child(7){animation-delay:0.24s}
+  .prompt-header { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+  .prompt-num { font-size: 10px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--hint); padding: 1px 6px; border-radius: 4px; }
+  .prompt-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .prompt-what { font-size: 12px; color: var(--muted); margin-bottom: 9px; line-height: 1.6; }
+  .prompt-box { background: var(--surface); border: 1px solid var(--border2); border-radius: 7px; padding: 10px 52px 10px 11px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); line-height: 1.75; position: relative; white-space: pre-wrap; }
+  .prompt-box em { color: var(--blue); font-style: normal; font-weight: 500; }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: var(--bg); border: 1px solid var(--border2); border-radius: 5px; color: var(--hint); font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; cursor: pointer; transition: all 0.15s; }
+  .copy-btn:hover { background: var(--surface2); color: var(--text); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green-border); }
+
+  /* SCRIPTS */
+  .script-intro { background: var(--blue-bg); border: 1px solid var(--blue-border); border-left: 3px solid var(--blue); border-radius: 9px; padding: 11px 13px; margin-bottom: 14px; font-size: 12px; color: var(--muted); line-height: 1.65; }
+  .script-intro strong { color: var(--blue); font-weight: 600; }
+  .script-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px; margin-bottom: 8px; animation: fadeUp 0.35s ease both; }
+  .script-card:nth-child(2){animation-delay:0.04s}.script-card:nth-child(3){animation-delay:0.08s}
+  .script-card:nth-child(4){animation-delay:0.12s}.script-card:nth-child(5){animation-delay:0.16s}
+  .script-label { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .script-pill { font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 8px; border-radius: 20px; font-weight: 500; border: 1px solid; }
+  .script-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .script-desc { font-size: 12px; color: var(--muted); margin-bottom: 9px; line-height: 1.6; }
+  .niche-input-row { display: flex; gap: 7px; margin-bottom: 10px; }
+  .niche-input { flex: 1; padding: 8px 11px; border: 1.5px solid var(--border2); border-radius: 7px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+  .niche-input:focus { border-color: var(--blue); }
+  .niche-input::placeholder { color: var(--hint); }
+  .insert-btn { padding: 8px 12px; border-radius: 7px; background: var(--blue); color: #fff; border: none; font-size: 11px; font-family: 'DM Mono', monospace; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .insert-btn:hover { background: #1d4ed8; }
+  .script-count-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .count-label { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--hint); }
+  .count-btn { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; transition: background 0.1s; flex-shrink: 0; }
+  .count-btn:hover { background: var(--surface2); }
+  .count-num { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; min-width: 24px; text-align: center; }
+  .section-divider { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--hint); text-transform: uppercase; letter-spacing: 0.1em; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('explainer', this)">How It Works</div>
+  <div class="tab" onclick="switchTab('routine', this)">Routine</div>
+  <div class="tab" onclick="switchTab('prompts', this)">Channel Prompts</div>
+  <div class="tab" onclick="switchTab('scripts', this)">Script & Prompts</div>
+</div>
+
+<!-- ───── HOW IT WORKS ───── -->
+<div class="page active" id="explainer">
+  <header>
+    <h1>How it all works</h1>
+    <p>read this first — simple explanation of the whole process</p>
+  </header>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--blue-bg);">🎯</div>
+      <div>
+        <div class="explainer-htitle">What you're making</div>
+        <div class="explainer-hsub">the big picture</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      You're making a <strong>50–60 second YouTube Short</strong> entirely with free AI tools. No camera, no filming, no editing skills needed. Just prompts and a bit of time.
+    </div>
+  </div>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--green-bg);">🖼️</div>
+      <div>
+        <div class="explainer-htitle">Step 1 — The Images</div>
+        <div class="explainer-hsub">what the viewer actually sees</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      You start by describing what you want to see in each scene. <strong>Nano Banana 2</strong> (on Runway) then generates a still image for each scene.<br><br>
+      For a 60 second video you need about <strong>8–10 images</strong> — one per scene. You use a prompt in the Script & Prompts tab to generate all the image descriptions automatically.
+    </div>
+  </div>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--purple-bg);">🎬</div>
+      <div>
+        <div class="explainer-htitle">Step 2 — The Video Clips</div>
+        <div class="explainer-hsub">making the images move</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      Still images don't move — so you upload each one to a video AI like <strong>Luma, Kling, or Pika</strong> and it animates it into a 5–6 second moving clip. You rotate between sites so you don't run out of free credits.<br><br>
+      You use a prompt to tell the AI <strong>how to animate</strong> each image (e.g. slow zoom, camera pan, wind blowing).
+    </div>
+  </div>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--amber-bg);">🎙️</div>
+      <div>
+        <div class="explainer-htitle">Step 3 — The Voice (voiceover)</div>
+        <div class="explainer-hsub">the words spoken over the video</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      The script is <strong>only the words that get spoken</strong> — like a narrator talking over the clips. You generate it with Claude or Gemini. It has 8–10 sentences, each about 5–6 seconds long, adding up to ~60 seconds total.<br><br>
+      You paste the script into <strong>ElevenLabs</strong> which turns it into a real-sounding AI voice. That becomes your audio file.
+    </div>
+  </div>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--pink-bg);">🎵</div>
+      <div>
+        <div class="explainer-htitle">Step 4 — Putting it all together</div>
+        <div class="explainer-hsub">the final edit in capcut</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      Open <strong>CapCut</strong> (free). Import all your video clips and your voiceover audio. Line the clips up so they cover the audio. Add auto-captions, background music, and colour grade. Export at <strong>1080×1920</strong> (vertical, for Shorts). Done.
+    </div>
+  </div>
+
+  <div class="explainer-block">
+    <div class="explainer-head">
+      <div class="explainer-icon" style="background:var(--coral-bg);">💡</div>
+      <div>
+        <div class="explainer-htitle">The simple order to follow</div>
+        <div class="explainer-hsub">do these tabs in this order</div>
+      </div>
+    </div>
+    <div class="explainer-body">
+      <div style="margin-bottom:6px;"><strong>1. Channel Prompts tab</strong> → find your niche and plan your channel</div>
+      <div style="margin-bottom:6px;"><strong>2. Script & Prompts tab</strong> → generate your script, image descriptions, and animation prompts</div>
+      <div style="margin-bottom:6px;"><strong>3. Routine tab</strong> → follow step by step to actually make the video</div>
+      <div><strong>4. Quick Links</strong> (bottom of Routine tab) → shortcuts to every website you need</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── ROUTINE ───── -->
+<div class="page" id="routine">
+  <header>
+    <h1>Step-by-step Routine</h1>
+    <p>follow this every time you make a short</p>
+  </header>
+
+  <div class="step">
+    <div class="num" style="color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);">1</div>
+    <div class="card">
+      <div class="card-title">Generate your script <span class="badge" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">~5 min</span></div>
+      <div class="card-desc">Go to the Script & Prompts tab → use the Script prompt → paste into Claude or Gemini → copy the script you like best.</div>
+      <div class="tags"><span class="tag blue">Script & Prompts tab</span></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="step">
+    <div class="num" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">2</div>
+    <div class="card">
+      <div class="card-title">Generate image descriptions <span class="badge" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">~2 min</span></div>
+      <div class="card-desc">Use the Image Prompt generator in Script & Prompts tab → paste your script in → it gives you one image description per sentence.</div>
+      <div class="tags"><span class="tag green">Script & Prompts tab</span></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="step">
+    <div class="num" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">3</div>
+    <div class="card">
+      <div class="card-title">Make your images <span class="badge" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">Nano Banana 2</span></div>
+      <div class="card-desc">Runway → Image → Nano Banana 2. Paste each image description as a prompt. Generate and download all images.</div>
+      <div class="tags"><span class="tag amber">runwayml.com → Image → Nano Banana 2</span></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="step">
+    <div class="num" style="color:var(--purple);border-color:var(--purple-border);background:var(--purple-bg);">4</div>
+    <div class="card">
+      <div class="card-title">Animate images → video clips <span class="badge" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">~20 min</span></div>
+      <div class="card-desc">Use the Video Prompt generator to get animation instructions. Upload each image + animation prompt to a video site. Rotate sites to save credits.</div>
+      <div class="tags">
+        <span class="tag purple">Luma → clips 1–3</span>
+        <span class="tag purple">Kling → clips 4–6</span>
+        <span class="tag purple">Pika → clips 7–8</span>
+        <span class="tag purple">Vidu → clips 9–10</span>
+      </div>
+      <div class="sub-note">pixverse.ai as backup</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="step">
+    <div class="num" style="color:var(--coral);border-color:var(--coral-border);background:var(--coral-bg);">5</div>
+    <div class="card">
+      <div class="card-title">Record voiceover <span class="badge" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">free</span></div>
+      <div class="card-desc">Go to ElevenLabs → paste your full script → pick a voice → download the audio file. This is what gets spoken in your video.</div>
+      <div class="tags"><span class="tag">elevenlabs.io (free tier)</span></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="step">
+    <div class="num" style="color:var(--pink);border-color:var(--pink-border);background:var(--pink-bg);">6</div>
+    <div class="card">
+      <div class="card-title">Edit & export in CapCut <span class="badge" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">~15 min</span></div>
+      <div class="card-desc">Import all video clips + voiceover audio. Line clips up to cover the audio. Add auto-captions, music, colour grade. Export 1080×1920 (9:16).</div>
+      <div class="tags"><span class="tag">CapCut (free)</span></div>
+    </div>
+  </div>
+
+  <div class="tip"><strong>Remember:</strong> The script = the voice. The images = what you see. They don't have to match word for word — the voice just plays over the visuals.</div>
+
+  <div class="links">
+    <h3>Quick Links</h3>
+    <div class="link-grid">
+      <a class="link-item" href="https://app.runwayml.com" target="_blank"><div class="link-dot" style="background:var(--amber)"></div><div><div class="link-name">Runway</div><div class="link-sub">Nano Banana 2</div></div></a>
+      <a class="link-item" href="https://lumalabs.ai/dream-machine" target="_blank"><div class="link-dot" style="background:var(--blue)"></div><div><div class="link-name">Luma</div><div class="link-sub">animate images</div></div></a>
+      <a class="link-item" href="https://kling.ai" target="_blank"><div class="link-dot" style="background:var(--purple)"></div><div><div class="link-name">Kling AI</div><div class="link-sub">animate images</div></div></a>
+      <a class="link-item" href="https://pika.art" target="_blank"><div class="link-dot" style="background:var(--pink)"></div><div><div class="link-name">Pika</div><div class="link-sub">animate images</div></div></a>
+      <a class="link-item" href="https://vidu.studio" target="_blank"><div class="link-dot" style="background:var(--green)"></div><div><div class="link-name">Vidu</div><div class="link-sub">animate images</div></div></a>
+      <a class="link-item" href="https://pixverse.ai" target="_blank"><div class="link-dot" style="background:var(--coral)"></div><div><div class="link-name">Pixverse</div><div class="link-sub">backup credits</div></div></a>
+      <a class="link-item" href="https://elevenlabs.io" target="_blank"><div class="link-dot" style="background:var(--blue)"></div><div><div class="link-name">ElevenLabs</div><div class="link-sub">voiceover audio</div></div></a>
+      <a class="link-item" href="https://capcut.com" target="_blank"><div class="link-dot" style="background:#888"></div><div><div class="link-name">CapCut</div><div class="link-sub">edit & export</div></div></a>
+    </div>
+  </div>
+</div>
+
+<!-- ───── CHANNEL PROMPTS ───── -->
+<div class="page" id="prompts">
+  <header>
+    <h1>Channel Builder Prompts</h1>
+    <p>use these once to plan and set up your channel</p>
+  </header>
+  <div class="order-note">Run in order — each one builds on the last. Start here if you don't have a niche yet.</div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">01</span><span class="prompt-title">Find Your Niche</span></div>
+    <div class="prompt-what">Suggests 10 profitable niches and recommends the best one for a beginner. Run this first.</div>
+    <div class="prompt-box">Act as a YouTube growth strategist. I want to start an AI-generated YouTube Shorts channel but I don't know my niche yet. Suggest 10 profitable niches that have strong demand, search volume, and monetization potential in 2025. For each niche give me: the target audience, content style, why it works for AI video, and estimated difficulty to grow. Then recommend the best one for a beginner.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">02</span><span class="prompt-title">Channel Strategy</span></div>
+    <div class="prompt-what">Full strategy for your channel — positioning, audience, content themes, growth plan.</div>
+    <div class="prompt-box">Act as a $10K/month YouTube creator agency strategist. Analyze this niche, its audience, competitors, and monetization potential. Create a full channel strategy including positioning, audience targeting, content themes, and growth opportunities. Channel niche: <em>[insert niche]</em>.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">03</span><span class="prompt-title">Channel Identity</span></div>
+    <div class="prompt-what">Channel name, description, brand voice, and visual style.</div>
+    <div class="prompt-box">Create a complete identity for my YouTube channel in <em>[insert niche]</em>. Generate a memorable channel name, clear channel description, brand voice, visual style suggestions, and positioning that attracts the right audience.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">04</span><span class="prompt-title">50 Video Ideas</span></div>
+    <div class="prompt-what">50 engaging video ideas for your niche focused on curiosity and views.</div>
+    <div class="prompt-box">Generate 50 highly engaging video ideas for my AI YouTube Shorts channel in the niche: <em>[insert niche]</em>. Focus on topics that trigger curiosity, solve real problems, or tell compelling stories likely to attract views and engagement.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">05</span><span class="prompt-title">Titles & Thumbnails</span></div>
+    <div class="prompt-what">20 click-worthy titles and thumbnail ideas for any video topic.</div>
+    <div class="prompt-box">Generate 20 YouTube titles and thumbnail ideas for <em>[insert topic]</em>. Ensure they spark curiosity, clearly communicate value, and increase click-through rate.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <div class="prompt-card">
+    <div class="prompt-header"><span class="prompt-num">06</span><span class="prompt-title">90-Day Monetization Roadmap</span></div>
+    <div class="prompt-what">Realistic plan with milestones, posting schedule, growth tactics, revenue timeline.</div>
+    <div class="prompt-box">Create a realistic 90-day monetization roadmap for my AI YouTube Shorts channel in the niche: <em>[insert niche]</em>. Include subscriber milestones, content frequency, audience growth tactics, and revenue opportunities.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+</div>
+
+<!-- ───── SCRIPT & PROMPTS ───── -->
+<div class="page" id="scripts">
+  <header>
+    <h1>Script & Prompts</h1>
+    <p>use these every time you make a new video · do them in order</p>
+  </header>
+
+  <div class="script-intro">
+    <strong>Do these 3 steps in order for every video:</strong><br>
+    1. Generate image descriptions (what to draw) → 2. Generate animation prompts (how to make images move) → 3. Generate your voiceover script (the words spoken)
+  </div>
+
+  <!-- NICHE INPUT -->
+  <div class="script-card">
+    <div class="script-label"><span class="script-pill" style="color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);">setup</span></div>
+    <div class="script-title" style="margin-bottom:6px;">Type your niche once</div>
+    <div class="script-desc">This fills into all 3 prompts below automatically so you don't have to type it every time.</div>
+    <div class="niche-input-row">
+      <input class="niche-input" id="nicheInput" type="text" placeholder="e.g. dark history facts, AI tools for students...">
+      <button class="insert-btn" onclick="insertNiche()">Insert →</button>
+    </div>
+  </div>
+
+  <!-- PROMPT 1: SCRIPTS -->
+  <div class="section-divider">① Script — the voiceover words</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);">step 1</span>
+      <span class="script-title">Script Generator</span>
+    </div>
+    <div class="script-desc">
+      Generates multiple complete scripts. Each script = the words spoken in one video. Paste into Claude or Gemini. Pick your favourite script and keep it for steps 2 and 3.
+    </div>
+    <div class="script-count-row">
+      <span class="count-label">number of scripts:</span>
+      <button class="count-btn" onclick="changeCount(-1)">−</button>
+      <span class="count-num" id="countNum">10</span>
+      <button class="count-btn" onclick="changeCount(1)">+</button>
+    </div>
+    <div class="prompt-box" id="scriptPrompt">You are an expert YouTube Shorts scriptwriter. Generate <em id="countDisplay">10</em> complete scripts for a YouTube Shorts channel in the niche: <em id="nicheDisplay1">[insert niche]</em>.
+
+Each script must:
+- Be 8–10 sentences long (50–60 seconds spoken at natural pace)
+- Start with a powerful hook that grabs attention in the first 3 seconds
+- Flow naturally as a voiceover — no bullet points, just spoken sentences
+- Build curiosity or tell a story throughout
+- End with a strong closing line or call to action
+- Be written for a general audience, no jargon
+
+Format each script as:
+SCRIPT [number]: [title]
+[full script text]
+
+Only output the scripts — no extra commentary.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <!-- PROMPT 1: IMAGE DESCRIPTIONS -->
+  <div class="section-divider">① Images — generate these first in Nano Banana 2</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">step 1</span>
+      <span class="script-title">Image Prompt Generator</span>
+    </div>
+    <div class="script-desc">
+      Paste your video topic below the prompt. It gives you 10 image descriptions — paste each one into <strong>Runway → Nano Banana 2</strong> to generate your images. Download them all.
+    </div>
+    <div class="prompt-box">You are a visual director for AI-generated YouTube Shorts. I will give you a video topic. Generate 10 detailed image generation prompts for scenes that would appear in a short video about this topic.
+
+Rules:
+- One image prompt per scene
+- Each prompt should describe a cinematic, photorealistic scene
+- Include: subject, setting, lighting, mood, camera angle
+- Style: cinematic, 8K, dramatic lighting, ultra detailed
+- Do not include any text or words in the image
+- Number each prompt 1 to 10
+
+The niche is: <em id="nicheDisplay2">[insert niche]</em>
+
+The video topic is:
+<em>[describe your video topic here e.g. "the rise and fall of ancient Rome"]</em><button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <!-- PROMPT 2: ANIMATION PROMPTS -->
+  <div class="section-divider">② Videos — animate each image into a moving clip</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--purple);border-color:var(--purple-border);background:var(--purple-bg);">step 2</span>
+      <span class="script-title">Video Animation Prompt Generator</span>
+    </div>
+    <div class="script-desc">
+      Paste your image descriptions below the prompt. It gives you one animation instruction per image — paste these into Luma, Kling, Pika, or Vidu when you upload each image to animate it.
+    </div>
+    <div class="prompt-box">You are a video director for AI-generated short films. I will give you a list of image descriptions. For each one, write a short animation prompt that tells an AI video tool how to bring that image to life.
+
+Rules:
+- One animation prompt per image
+- Keep each prompt under 20 words
+- Use cinematic camera movements: slow zoom in, slow pan left, camera drift forward, subtle parallax, gentle push in
+- Add atmosphere: dust particles, light rays, wind in hair, flickering flame, rippling water
+- Match the mood of the image
+- Number each prompt to match the image number
+
+The niche is: <em id="nicheDisplay3">[insert niche]</em>
+
+Here are the image descriptions:
+<em>[paste your image descriptions here]</em><button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <!-- PROMPT 3: VOICE/SCRIPT -->
+  <div class="section-divider">③ Voice — generate the script for your voiceover</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);">step 3</span>
+      <span class="script-title">Script Generator</span>
+    </div>
+    <div class="script-desc">
+      Generates voiceover scripts — the words spoken over your video. Paste into Claude or Gemini, pick your favourite, then paste it into <strong>ElevenLabs</strong> to turn it into an AI voice.
+    </div>
+    <div class="script-count-row">
+      <span class="count-label">number of scripts:</span>
+      <button class="count-btn" onclick="changeCount(-1)">−</button>
+      <span class="count-num" id="countNum">10</span>
+      <button class="count-btn" onclick="changeCount(1)">+</button>
+    </div>
+    <div class="prompt-box" id="scriptPrompt">You are an expert YouTube Shorts scriptwriter. Generate <em id="countDisplay">10</em> complete voiceover scripts for a YouTube Shorts video in the niche: <em id="nicheDisplay1">[insert niche]</em>.
+
+Each script must:
+- Be 8–10 sentences long (50–60 seconds spoken at natural pace)
+- Start with a powerful hook that grabs attention in the first 3 seconds
+- Flow naturally as a voiceover — no bullet points, just spoken sentences
+- Build curiosity or tell a story throughout
+- End with a strong closing line or call to action
+- Be written for a general audience, no jargon
+
+Format each script as:
+SCRIPT [number]: [title]
+[full script text]
+
+Only output the scripts — no extra commentary.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="section-divider">bonus — improve what you get back</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">bonus</span>
+      <span class="script-title">Script Refiner</span>
+    </div>
+    <div class="script-desc">Got a script but it feels flat? Use this to punch it up.</div>
+    <div class="prompt-box">Rewrite this YouTube Shorts script to make it more engaging. Keep it 8–10 sentences. Make the hook stronger, add more curiosity throughout, and make the ending more memorable. Keep the same topic and facts but improve the delivery and flow.
+
+Here is the script:
+<em>[paste script here]</em><button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+</div>
+
+<script>
+  let scriptCount = 10;
+
+  function switchTab(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function changeCount(delta) {
+    scriptCount = Math.max(1, Math.min(30, scriptCount + delta));
+    document.getElementById('countNum').textContent = scriptCount;
+    document.getElementById('countDisplay').textContent = scriptCount;
+  }
+
+  function insertNiche() {
+    const val = document.getElementById('nicheInput').value.trim();
+    if (!val) return;
+    ['nicheDisplay1','nicheDisplay2','nicheDisplay3'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = val;
+      el.style.color = 'var(--blue)';
+    });
+  }
+
+  function copyPrompt(btn) {
+    const box = btn.parentElement;
+    const clone = box.cloneNode(true);
+    clone.querySelector('button').remove();
+    const text = clone.innerText.trim();
+
+    function markCopied() {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(markCopied).catch(fallback);
+    } else {
+      fallback();
+    }
+
+    function fallback() {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        markCopied();
+      } catch(e) {
+        btn.textContent = 'select & copy manually';
+        setTimeout(() => { btn.textContent = 'copy'; }, 3000);
+      }
+      document.body.removeChild(ta);
+    }
+  }
+</script>
+</body>
+</html>
