@@ -667,7 +667,28 @@ Here is the script:
     document.getElementById('nicheInput').value = name;
   }
 
-  document.addEventListener('DOMContentLoaded', renderNiches);
+  function saveNote(n) {
+    localStorage.setItem('note'+n, document.getElementById('note'+n).value);
+  }
+  function saveNotionUrl() {
+    localStorage.setItem('notionUrl', document.getElementById('notionUrl').value);
+  }
+  function openNotion() {
+    const url = document.getElementById('notionUrl').value.trim();
+    if (url) window.open(url, '_blank');
+    else window.open('https://notion.so', '_blank');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    renderNiches();
+    [1,2,3,4,5].forEach(n => {
+      const el = document.getElementById('note'+n);
+      const saved = localStorage.getItem('note'+n);
+      if (el && saved) el.value = saved;
+    });
+    const nu = document.getElementById('notionUrl');
+    const savedUrl = localStorage.getItem('notionUrl');
+    if (nu && savedUrl) nu.value = savedUrl;
+  });
 </script>
 
 <style>
@@ -715,65 +736,63 @@ Here is the script:
     </div>
   </div>
 
+  <div class="niche-list" id="nicheList"></div>
+</div>
+
 <!-- ───── NOTES ───── -->
 <div class="page" id="notes">
   <header>
     <h1>Notes</h1>
-    <p>quick notes · saved automatically in your browser</p>
+    <p>quick notes · saved automatically</p>
   </header>
 
-  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;margin-bottom:8px;">
-    <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">your notion link</div>
+  <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;margin-bottom:8px;">
+    <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">your notion link</div>
     <div style="display:flex;gap:7px;">
-      <input id="notionUrl" type="text" placeholder="Paste your Notion page URL here..." oninput="saveNotionUrl()" style="flex:1;padding:8px 11px;border:1.5px solid var(--border2);border-radius:7px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);background:var(--bg);outline:none;">
-      <button onclick="openNotion()" style="padding:8px 12px;border-radius:7px;background:var(--text);color:var(--bg);border:none;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;white-space:nowrap;">Open ↗</button>
+      <input id="notionUrl" type="text" placeholder="Paste your Notion page URL here..." style="flex:1;padding:8px 11px;border:1.5px solid #d0d0d0;border-radius:7px;font-family:'DM Mono',monospace;font-size:12px;color:#111;background:#fff;outline:none;">
+      <button onclick="openNotion()" style="padding:8px 12px;border-radius:7px;background:#111;color:#fff;border:none;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;white-space:nowrap;">Open ↗</button>
     </div>
   </div>
 
   <div style="display:flex;flex-direction:column;gap:8px;">
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">note 1</div>
-      <textarea id="note1" oninput="saveNote(1)" placeholder="Type a note..." style="width:100%;min-height:80px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;color:#111;resize:vertical;line-height:1.6;border-radius:6px;padding:4px;border:1px solid #e2e2e2;"></textarea>
+    <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">note 1</div>
+      <textarea id="note1" placeholder="Type a note..." style="width:100%;min-height:80px;border:1px solid #e2e2e2;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#111;background:#fff;resize:vertical;line-height:1.6;border-radius:6px;padding:8px;"></textarea>
     </div>
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">note 2</div>
-      <textarea id="note2" oninput="saveNote(2)" placeholder="Type a note..." style="width:100%;min-height:80px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;color:#111;resize:vertical;line-height:1.6;border-radius:6px;padding:4px;border:1px solid #e2e2e2;"></textarea>
+    <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">note 2</div>
+      <textarea id="note2" placeholder="Type a note..." style="width:100%;min-height:80px;border:1px solid #e2e2e2;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#111;background:#fff;resize:vertical;line-height:1.6;border-radius:6px;padding:8px;"></textarea>
     </div>
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">note 3</div>
-      <textarea id="note3" oninput="saveNote(3)" placeholder="Type a note..." style="width:100%;min-height:80px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;color:#111;resize:vertical;line-height:1.6;border-radius:6px;padding:4px;border:1px solid #e2e2e2;"></textarea>
+    <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">note 3</div>
+      <textarea id="note3" placeholder="Type a note..." style="width:100%;min-height:80px;border:1px solid #e2e2e2;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#111;background:#fff;resize:vertical;line-height:1.6;border-radius:6px;padding:8px;"></textarea>
     </div>
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">note 4</div>
-      <textarea id="note4" oninput="saveNote(4)" placeholder="Type a note..." style="width:100%;min-height:80px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;color:#111;resize:vertical;line-height:1.6;border-radius:6px;padding:4px;border:1px solid #e2e2e2;"></textarea>
+    <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">note 4</div>
+      <textarea id="note4" placeholder="Type a note..." style="width:100%;min-height:80px;border:1px solid #e2e2e2;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#111;background:#fff;resize:vertical;line-height:1.6;border-radius:6px;padding:8px;"></textarea>
     </div>
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--hint);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">note 5</div>
-      <textarea id="note5" oninput="saveNote(5)" placeholder="Type a note..." style="width:100%;min-height:80px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;color:#111;resize:vertical;line-height:1.6;border-radius:6px;padding:4px;border:1px solid #e2e2e2;"></textarea>
+    <div style="background:#f7f7f7;border:1.5px solid #e2e2e2;border-radius:10px;padding:13px 14px;">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:#999;margin-bottom:6px;text-transform:uppercase;">note 5</div>
+      <textarea id="note5" placeholder="Type a note..." style="width:100%;min-height:80px;border:1px solid #e2e2e2;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#111;background:#fff;resize:vertical;line-height:1.6;border-radius:6px;padding:8px;"></textarea>
     </div>
   </div>
 </div>
 
 <script>
-  function saveNote(n) {
-    localStorage.setItem('note'+n, document.getElementById('note'+n).value);
-  }
-  function saveNotionUrl() {
-    localStorage.setItem('notionUrl', document.getElementById('notionUrl').value);
-  }
   function openNotion() {
-    const url = document.getElementById('notionUrl').value.trim();
-    if (url) window.open(url, '_blank');
-    else window.open('https://notion.so', '_blank');
+    var url = document.getElementById('notionUrl').value.trim();
+    window.open(url || 'https://notion.so', '_blank');
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    [1,2,3,4,5].forEach(n => {
-      const saved = localStorage.getItem('note'+n);
-      if (saved) document.getElementById('note'+n).value = saved;
-    });
-    const notionUrl = localStorage.getItem('notionUrl');
-    if (notionUrl) document.getElementById('notionUrl').value = notionUrl;
+  ['note1','note2','note3','note4','note5'].forEach(function(id) {
+    var el = document.getElementById(id);
+    var saved = localStorage.getItem(id);
+    if (saved) el.value = saved;
+    el.addEventListener('input', function() { localStorage.setItem(id, el.value); });
   });
+  var notionEl = document.getElementById('notionUrl');
+  var savedNotion = localStorage.getItem('notionUrl');
+  if (savedNotion) notionEl.value = savedNotion;
+  notionEl.addEventListener('input', function() { localStorage.setItem('notionUrl', notionEl.value); });
 </script>
 
 </body>
