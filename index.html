@@ -262,7 +262,7 @@
     <div class="num" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">3</div>
     <div class="card">
       <div class="card-title">Make your images <span class="badge" style="color:var(--amber);border-color:var(--amber-border);background:var(--amber-bg);">Nano Banana 2</span></div>
-      <div class="card-desc">Runway → Image → Nano Banana 2. Paste each image description as a prompt. Generate and download all images.</div>
+      <div class="card-desc">Runway → Image → Nano Banana 2. Paste each image description as a prompt. Set aspect ratio to <strong style="color:var(--coral);">9:16</strong>. Generate and download all images.</div>
       <div class="tags"><span class="tag amber">runwayml.com → Image → Nano Banana 2</span></div>
     </div>
   </div>
@@ -287,7 +287,7 @@
     <div class="card">
       <div class="card-title">Record voiceover <span class="badge" style="color:var(--green);border-color:var(--green-border);background:var(--green-bg);">free</span></div>
       <div class="card-desc">Go to ElevenLabs → paste your full script → pick a voice → download the audio file. This is what gets spoken in your video.</div>
-      <div class="tags"><span class="tag">elevenlabs.io (free tier)</span></div>
+      <div class="tags"><span class="tag">Speechma (free)</span><span class="tag">elevenlabs.io (free tier)</span></div>
     </div>
   </div>
   <div class="arrow">↓</div>
@@ -404,7 +404,7 @@
       <span class="script-title">Image Prompt Generator</span>
     </div>
     <div class="script-desc">
-      Paste your video topic below the prompt. It gives you 10 image descriptions — paste each one into <strong>Runway → Nano Banana 2</strong> to generate your images. Download them all.
+      Paste your video topic below the prompt. It gives you 10 image descriptions — paste each one into <strong>Runway → Nano Banana 2</strong> to generate your images. Download them all. <strong style="color:var(--coral);">⚠️ Always set aspect ratio to 9:16 (vertical) for Shorts!</strong>
     </div>
     <div class="prompt-box">You are a visual director for AI-generated YouTube Shorts. I will give you a video topic. Generate 10 detailed image generation prompts for scenes that would appear in a short video about this topic.
 
@@ -412,7 +412,7 @@ Rules:
 - One image prompt per scene
 - Each prompt should describe a cinematic, photorealistic scene
 - Include: subject, setting, lighting, mood, camera angle
-- Style: cinematic, 8K, dramatic lighting, ultra detailed
+- Style: cinematic, 8K, dramatic lighting, ultra detailed, vertical 9:16 aspect ratio for YouTube Shorts
 - Do not include any text or words in the image
 - Number each prompt 1 to 10
 
@@ -458,7 +458,7 @@ Here are the image descriptions:
       <span class="script-title">Script Generator</span>
     </div>
     <div class="script-desc">
-      Generates voiceover scripts — the words spoken over your video. Paste into Claude or Gemini, pick your favourite, then paste it into <strong>ElevenLabs</strong> to turn it into an AI voice.
+      Generates voiceover scripts matched to your video scenes. First generate your image descriptions (Step 1), then paste them at the bottom of this prompt so the script matches what's on screen. Paste into Claude or Gemini, then into <strong>Speechma</strong> for the voiceover.
     </div>
     <div class="script-count-row">
       <span class="count-label">number of scripts:</span>
@@ -469,16 +469,63 @@ Here are the image descriptions:
     <div class="prompt-box" id="scriptPrompt">You are an expert YouTube Shorts scriptwriter. Generate <em id="countDisplay">10</em> complete voiceover scripts for a YouTube Shorts video in the niche: <em id="nicheDisplay1">[insert niche]</em>.
 
 Each script must:
+- Start with a powerful 1 sentence hook that grabs attention in the first 3 seconds
 - Be 8–10 sentences long (50–60 seconds spoken at natural pace)
-- Start with a powerful hook that grabs attention in the first 3 seconds
 - Flow naturally as a voiceover — no bullet points, just spoken sentences
 - Build curiosity or tell a story throughout
-- End with a strong closing line or call to action
+- End with this exact closing line: "Follow for more [niche topic] they don't want you to know about."
 - Be written for a general audience, no jargon
+
+IMPORTANT: I will paste my scene descriptions below. Write the script so each sentence matches what is happening in each scene in order — the voiceover must be relevant to the visuals.
 
 Format each script as:
 SCRIPT [number]: [title]
 [full script text]
+
+Only output the scripts — no extra commentary.
+
+Here are my scene descriptions — write the script to match these in order:
+<em>[paste your scene descriptions from Gemini here]</em><button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
+  </div>
+
+  <!-- RANKING VIDEO -->
+  <div class="section-divider">🏆 ranking videos — countdown format</div>
+
+  <div class="script-card">
+    <div class="script-label">
+      <span class="script-pill" style="color:var(--purple);border-color:var(--purple-border);background:var(--purple-bg);">ranking</span>
+      <span class="script-title">Ranking Video Script Generator</span>
+    </div>
+    <div class="script-desc">
+      Generates a countdown ranking script — each position is one image/clip. Numbers count down on screen while the voiceover reveals each entry. Perfect for dark history, psychology, space, ancient civilisations.
+    </div>
+    <div class="script-count-row">
+      <span class="count-label">number of scripts:</span>
+      <button class="count-btn" onclick="changeRankCount(-1)">−</button>
+      <span class="count-num" id="rankCountNum">5</span>
+      <button class="count-btn" onclick="changeRankCount(1)">+</button>
+    </div>
+    <div class="prompt-box">You are an expert YouTube Shorts scriptwriter specialising in ranking videos. Generate <em id="rankCountDisplay">5</em> complete ranking countdown scripts for a YouTube Shorts channel in the niche: <em id="nicheDisplay4">[insert niche]</em>.
+
+Each script must follow this exact format:
+- Hook (1 sentence): A shocking statement that sets up the ranking e.g. "These are the 5 most brutal punishments in history — ranked."
+- Position 5 (2 sentences): Introduce and describe entry #5
+- Position 4 (2 sentences): Introduce and describe entry #4, slightly more shocking
+- Position 3 (2 sentences): Introduce and describe entry #3, building tension
+- Position 2 (2 sentences): Introduce and describe entry #2, very shocking
+- Position 1 (2 sentences): The most shocking reveal — "And the number one most..."
+- Closing line (1 sentence): A cliffhanger or call to action e.g. "Which one shocked you most? Comment below."
+
+Rules:
+- Each position must be MORE shocking or dramatic than the one before it
+- Keep each position description short and punchy — 2 sentences max
+- Write naturally as a voiceover — no bullet points
+- General audience, no jargon
+- Total script should be 50–60 seconds when spoken
+
+Format each script as:
+RANKING SCRIPT [number]: [title]
+[full script]
 
 Only output the scripts — no extra commentary.<button class="copy-btn" onclick="copyPrompt(this)">copy</button></div>
   </div>
@@ -501,6 +548,13 @@ Here is the script:
 
 <script>
   let scriptCount = 10;
+  let rankCount = 5;
+
+  function changeRankCount(delta) {
+    rankCount = Math.max(1, Math.min(20, rankCount + delta));
+    document.getElementById('rankCountNum').textContent = rankCount;
+    document.getElementById('rankCountDisplay').textContent = rankCount;
+  }
 
   function switchTab(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -527,7 +581,7 @@ Here is the script:
   function insertNiche() {
     const val = document.getElementById('nicheInput').value.trim();
     if (!val) return;
-    ['nicheDisplay1','nicheDisplay2','nicheDisplay3'].forEach(id => {
+    ['nicheDisplay1','nicheDisplay2','nicheDisplay3','nicheDisplay4'].forEach(id => {
       const el = document.getElementById(id);
       if (el) { el.textContent = val; el.style.color = 'var(--blue)'; }
     });
@@ -776,6 +830,7 @@ Here is the script:
 
   <div class="section-divider">🎬 Video — animate your images</div>
   <div class="link-grid" style="margin-bottom:16px;">
+    <a class="link-item" href="https://designarena.ai" target="_blank"><div class="link-dot" style="background:var(--text)"></div><div><div class="link-name">DesignArena</div><div class="link-sub">auto image & video gen</div></div></a>
     <a class="link-item" href="https://lumalabs.ai/dream-machine" target="_blank"><div class="link-dot" style="background:var(--blue)"></div><div><div class="link-name">Luma Dream Machine</div><div class="link-sub">clips 1–3</div></div></a>
     <a class="link-item" href="https://kling.ai" target="_blank"><div class="link-dot" style="background:var(--purple)"></div><div><div class="link-name">Kling AI</div><div class="link-sub">clips 4–6</div></div></a>
     <a class="link-item" href="https://pika.art" target="_blank"><div class="link-dot" style="background:var(--pink)"></div><div><div class="link-name">Pika</div><div class="link-sub">clips 7–8</div></div></a>
@@ -787,6 +842,7 @@ Here is the script:
 
   <div class="section-divider">🎙️ Voiceovers — turn script into audio</div>
   <div class="link-grid" style="margin-bottom:16px;">
+    <a class="link-item" href="https://speechma.com" target="_blank"><div class="link-dot" style="background:var(--green)"></div><div><div class="link-name">Speechma</div><div class="link-sub">completely free voiceover</div></div></a>
     <a class="link-item" href="https://elevenlabs.io" target="_blank"><div class="link-dot" style="background:var(--blue)"></div><div><div class="link-name">ElevenLabs</div><div class="link-sub">best free voiceover</div></div></a>
     <a class="link-item" href="https://murf.ai" target="_blank"><div class="link-dot" style="background:var(--purple)"></div><div><div class="link-name">Murf AI</div><div class="link-sub">free tier available</div></div></a>
     <a class="link-item" href="https://tiktok.com" target="_blank"><div class="link-dot" style="background:var(--text)"></div><div><div class="link-name">TikTok TTS</div><div class="link-sub">free text to speech</div></div></a>
